@@ -50,8 +50,6 @@ def configure(conf):
 
 	conf.load('fwgslib reconfigure compiler_optimizations enforce_pic')
 
-	enforce_pic = True # modern defaults
-
 	conf.env.VOICEMGR    = conf.options.VOICEMGR
 	conf.env.GOLDSRC     = conf.options.GOLDSRC
 
@@ -76,10 +74,8 @@ def configure(conf):
 	if conf.env.DEST_OS == 'android':
 		conf.options.GOLDSRC = False
 		conf.env.SERVER_NAME = 'server' # can't be any other name, until specified
-	
-	if conf.env.MAGX:
-		enforce_pic = False
 
+	enforce_pic = not conf.env.MAGX
 	conf.check_pic(enforce_pic)
 
 	# We restrict 64-bit builds ONLY for Win/Linux/OSX running on Intel architecture
@@ -168,9 +164,7 @@ def configure(conf):
 	if conf.env.COMPILER_CC == 'msvc':
 		conf.define('_CRT_SECURE_NO_WARNINGS', True)
 		conf.define('_CRT_NONSTDC_NO_DEPRECATE', True)
-	elif conf.env.COMPILER_CC == 'owcc':
-		pass
-	else:
+	elif conf.env.COMPILER_CC != 'owcc':
 		conf.env.append_unique('DEFINES', ['stricmp=strcasecmp', 'strnicmp=strncasecmp', '_snprintf=snprintf', '_vsnprintf=vsnprintf', '_LINUX', 'LINUX'])
 		conf.env.append_unique('CXXFLAGS', ['-Wno-invalid-offsetof', '-fno-rtti', '-fno-exceptions'])
 
